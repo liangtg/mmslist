@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="@color/mms_btn_background" />
+                    <size android:width="32dp" android:height="32dp" />
+                </shape>
+            </item>
+            <item android:width="16dp" android:height="16dp" android:drawable="@drawable/mms_faces" android:gravity="center"></item>
+        </layer-list>
+    </item>
+</selector>
