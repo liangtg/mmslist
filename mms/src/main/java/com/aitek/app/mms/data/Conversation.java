@@ -12,6 +12,9 @@ public class Conversation {
     public long hasAttach;
     public String address;
     public String person;
+    public String body;
+    public String threadId;
+    public int type;
 
     @Override public String toString() {
         return "Conversation{" +
@@ -24,6 +27,11 @@ public class Conversation {
             ", read=" + read +
             ", error=" + error +
             ", hasAttach=" + hasAttach +
+            ", address='" + address + '\'' +
+            ", person='" + person + '\'' +
+            ", body='" + body + '\'' +
+            ", threadId='" + threadId + '\'' +
+            ", type=" + type +
             '}';
     }
 }

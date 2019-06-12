@@ -21,11 +21,13 @@ public class Tables {
             Uri.parse("content://mms-sms/conversations");
         public static final Uri CONVERSATION_URI =
             MMSSMS_FULL_CONVERSATION_URI.buildUpon().appendQueryParameter("simple", "true").build();
-        static final String[] ALL_THREADS_PROJECTION = {
+        static final String[] ALL_THREADS_PROJECTION_SIMPLE = {
             "_id", "date", "message_count", "recipient_ids", "snippet", "snippet_cs", "read",
             "error",
             "has_attachment"
         };
+        static final String[] ALL_THREADS_PROJECTION =
+            { "_id", "address", "body", "date", "type", "thread_id" };
         static final int ID = 0;
         static final int DATE = 1;
         static final int MESSAGE_COUNT = 2;

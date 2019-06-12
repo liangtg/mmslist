@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.ConversationList;
 
@@ -36,7 +35,8 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_app_mms, container, false);
     }
 
@@ -65,7 +65,6 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             this.view = view;
             listView = view.findViewById(R.id.listview);
         }
-
     }
 
     private class ConversationListAdapter extends BaseAdapter {
@@ -90,7 +89,8 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             AdapterViewholder viewholder;
             View result = convertView;
             if (null == result) {
-                result = getLayoutInflater().inflate(R.layout.item_conversation_list, parent, false);
+                result =
+                    getLayoutInflater().inflate(R.layout.item_conversation_list, parent, false);
                 viewholder = new AdapterViewholder(result);
                 result.setTag(viewholder);
             } else {
@@ -106,7 +106,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             String title = item.person;
             if (TextUtils.isEmpty(title)) title = item.address;
             viewholder.itemTitle.setText(title);
-            viewholder.itemText.setText(item.snippet);
+            viewholder.itemText.setText(item.body);
             viewholder.itemDate.setText(TimeUtil.getChatTimeStr(item.date / 1000));
         }
     }
@@ -134,8 +134,11 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
         public void onClick(View v) {
             int id = v.getId();
             if (R.id.item_view == id) {
-                getFragmentManager().beginTransaction().add(R.id.conversation_container,
-                        ConversationDetailFragment.show(conversationList.getConversation(index))).addToBackStack("conversation_detail").commit();
+                getFragmentManager().beginTransaction()
+                    .add(R.id.conversation_container,
+                        ConversationDetailFragment.show(conversationList.getConversation(index)))
+                    .addToBackStack("conversation_detail")
+                    .commit();
             }
         }
     }
