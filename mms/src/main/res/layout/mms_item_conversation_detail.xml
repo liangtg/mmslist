@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout android:id="@+id/item_view"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/item_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="3dp"
     android:paddingLeft="5dp"
     android:paddingRight="5dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    >
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/mms_conversation_list_item"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        >
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/item_text"
+        <LinearLayout
+            android:id="@+id/item_text_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/item_title"
-            android:text="hahah"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-            android:textColor="#FFC4C4C4"
-            app:layout_constraintTop_toBottomOf="@+id/item_date"
-            />
-        <!--android:textSize="6sp"-->
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/item_date">
+
+            <TextView
+                android:id="@+id/item_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/mms_detail_receiver"
+                android:paddingLeft="@dimen/mms_bg_radius"
+                android:paddingRight="@dimen/mms_bg_radius"
+                android:text="hahah"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="#FFC4C4C4" />
+            <!--android:textSize="6sp"-->
+        </LinearLayout>
 
         <TextView
             android:id="@+id/item_date"
@@ -38,8 +41,7 @@
             android:textColor="#FFC4C4C4"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
         <!--android:textSize="6sp"-->
     </android.support.constraint.ConstraintLayout>
 </FrameLayout>

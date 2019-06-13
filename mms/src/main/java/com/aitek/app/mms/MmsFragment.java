@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.ConversationList;
 import com.daimajia.swipe.SwipeLayout;
@@ -36,8 +37,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-        @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_app_mms, container, false);
     }
 
@@ -90,8 +90,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             AdapterViewholder viewholder;
             View result = convertView;
             if (null == result) {
-                result =
-                    getLayoutInflater().inflate(R.layout.item_conversation_list, parent, false);
+                result = getLayoutInflater().inflate(R.layout.item_conversation_list, parent, false);
                 viewholder = new AdapterViewholder(result);
                 result.setTag(viewholder);
             } else {
@@ -107,7 +106,9 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             String title = item.person;
             if (TextUtils.isEmpty(title)) title = item.address;
             viewholder.itemTitle.setText(title);
-            viewholder.itemText.setText(item.body);
+            String body = item.snippet;
+            if (TextUtils.isEmpty(body)) body = item.body;
+            viewholder.itemText.setText(body);
             viewholder.itemDate.setText(TimeUtil.getChatTimeStr(item.date / 1000));
         }
     }
@@ -138,12 +139,8 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             int id = v.getId();
             if (R.id.swipe_layout == id) {
                 if (SwipeLayout.Status.Close == swipeLayout.getOpenStatus()) {
-                    getFragmentManager().beginTransaction()
-                        .add(R.id.conversation_container,
-                            ConversationDetailFragment.show(
-                                conversationList.getConversation(index)))
-                        .addToBackStack("conversation_detail")
-                        .commit();
+                    getFragmentManager().beginTransaction().add(R.id.conversation_container,
+                            ConversationDetailFragment.show(conversationList.getConversation(index))).addToBackStack("conversation_detail").commit();
                 }
             }
         }

@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.v4.util.SparseArrayCompat;
+
 import java.util.ArrayList;
 
 public class ConversationList {
@@ -19,10 +20,13 @@ public class ConversationList {
     public ConversationList(ContentResolver resolver) {
         this.resolver = resolver;
         queryHandler = new QueryHandler(resolver);
-        queryHandler.startQuery(QueryHandler.QUERY_ALL, null,
-            Tables.ConversationList.MMSSMS_FULL_CONVERSATION_URI,
-            Tables.ConversationList.ALL_THREADS_PROJECTION, null, null,
-            "date DESC");
+        queryHandler.startQuery(QueryHandler.QUERY_ALL,
+                null,
+                Tables.ConversationList.CONVERSATION_URI,
+                Tables.ConversationList.ALL_THREADS_PROJECTION_SIMPLE,
+                null,
+                null,
+                "date DESC");
     }
 
     public void addListener(QueryListener listener) {
@@ -35,28 +39,34 @@ public class ConversationList {
 
     private Conversation readConversation(Cursor cursor) {
         Conversation result = new Conversation();
-        //result.id = cursor.getLong(Tables.ConversationList.ID);
-        //result.date = cursor.getLong(Tables.ConversationList.DATE);
-        //result.msgCount = cursor.getLong(Tables.ConversationList.MESSAGE_COUNT);
-        //result.recipIDs = cursor.getString(Tables.ConversationList.RECIPIENT_IDS);
-        //result.snippet = cursor.getString(Tables.ConversationList.SNIPPET);
-        //result.snippetCS = cursor.getLong(Tables.ConversationList.SNIPPET_CS);
-        //result.read = cursor.getLong(Tables.ConversationList.READ);
-        //result.error = cursor.getLong(Tables.ConversationList.ERROR);
-        //result.hasAttach = cursor.getLong(Tables.ConversationList.HAS_ATTACHMENT);
-        //Cursor pc = resolver.query(MMS_PHONE,
-        //    new String[] { "_id", "address" }, "_id=?",
-        //    new String[] { result.recipIDs }, null);
-        //if (pc.moveToFirst()) {
-        //    result.address = pc.getString(1);
-        //}
-        //pc.close();
-        result.id = cursor.getLong(0);
-        result.address = cursor.getString(1);
-        result.body = cursor.getString(2);
-        result.date = cursor.getLong(3);
-        result.type = cursor.getInt(4);
-        result.threadId = cursor.getString(5);
+        result.id = cursor.getLong(Tables.ConversationList.ID);
+        result.date = cursor.getLong(Tables.ConversationList.DATE);
+        result.msgCount = cursor.getLong(Tables.ConversationList.MESSAGE_COUNT);
+        result.recipIDs = cursor.getString(Tables.ConversationList.RECIPIENT_IDS);
+        result.snippet = cursor.getString(Tables.ConversationList.SNIPPET);
+        result.snippetCS = cursor.getLong(Tables.ConversationList.SNIPPET_CS);
+        result.read = cursor.getLong(Tables.ConversationList.READ);
+        result.error = cursor.getLong(Tables.ConversationList.ERROR);
+        result.hasAttach = cursor.getLong(Tables.ConversationList.HAS_ATTACHMENT);
+        Cursor pc = resolver.query(MMS_PHONE, new String[]{"_id", "address"}, "_id=?", new String[]{result.recipIDs}, null);
+        if (pc.moveToFirst()) {
+            result.address = pc.getString(1);
+        }
+        pc.close();
+//        pc = resolver.query(Telephony.Sms.CONTENT_URI, new String[]{"thread_id"}, "_id=?", new String[]{String.valueOf(result.id)}, null);
+//        if (pc.moveToFirst()) {
+//            result.threadId = pc.getString(0);
+//            Log.d("mms", "tid:" + result.threadId);
+//            Log.d("mms", "_id:" + result.id);
+//        }
+//        pc.close();
+        result.threadId = String.valueOf(result.id);
+//        result.id = cursor.getLong(0);
+//        result.address = cursor.getString(1);
+//        result.body = cursor.getString(2);
+//        result.date = cursor.getLong(3);
+//        result.type = cursor.getInt(4);
+//        result.threadId = cursor.getString(5);
         return result;
     }
 
@@ -87,7 +97,8 @@ public class ConversationList {
             super(cr);
         }
 
-        @Override protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+        @Override
+        protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
             conversationCursor = cursor;
             dispatchListener();
         }

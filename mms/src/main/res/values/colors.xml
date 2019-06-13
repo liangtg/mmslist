@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="mms_btn_background">#ff53b67b</color>
+    <color name="mms_primary">#FF53B67B</color>
 </resources>
