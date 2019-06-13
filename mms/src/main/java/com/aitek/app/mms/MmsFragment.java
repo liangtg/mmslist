@@ -51,6 +51,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
 
     @Override
     public void onBackStackChanged() {
+        if (null == getFragmentManager()) return;
         if (getFragmentManager().getBackStackEntryCount() > 0) {
             viewHolder.listView.setVisibility(View.GONE);
         } else {
