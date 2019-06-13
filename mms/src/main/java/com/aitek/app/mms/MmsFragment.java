@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.ConversationList;
+import com.daimajia.swipe.SwipeLayout;
 
 public class MmsFragment extends Fragment implements FragmentManager.OnBackStackChangedListener {
     private ViewHolder viewHolder;
@@ -116,11 +117,13 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
         private TextView itemTitle;
         private TextView itemText;
         private TextView itemDate;
+        private SwipeLayout swipeLayout;
         private int index;
 
         public AdapterViewholder(View itemView) {
             this.itemView = itemView;
-            itemView.setOnClickListener(this);
+            swipeLayout = itemView.findViewById(R.id.swipe_layout);
+            swipeLayout.setOnClickListener(this);
             itemTitle = itemView.findViewById(R.id.item_title);
             itemText = itemView.findViewById(R.id.item_text);
             itemDate = itemView.findViewById(R.id.item_date);
@@ -133,12 +136,15 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
         @Override
         public void onClick(View v) {
             int id = v.getId();
-            if (R.id.item_view == id) {
-                getFragmentManager().beginTransaction()
-                    .add(R.id.conversation_container,
-                        ConversationDetailFragment.show(conversationList.getConversation(index)))
-                    .addToBackStack("conversation_detail")
-                    .commit();
+            if (R.id.swipe_layout == id) {
+                if (SwipeLayout.Status.Close == swipeLayout.getOpenStatus()) {
+                    getFragmentManager().beginTransaction()
+                        .add(R.id.conversation_container,
+                            ConversationDetailFragment.show(
+                                conversationList.getConversation(index)))
+                        .addToBackStack("conversation_detail")
+                        .commit();
+                }
             }
         }
     }

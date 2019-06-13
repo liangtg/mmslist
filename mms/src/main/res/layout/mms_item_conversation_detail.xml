@@ -12,7 +12,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="wrap_content"
         android:background="@drawable/mms_conversation_list_item"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
@@ -26,9 +26,9 @@
             android:text="hahah"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2"
             android:textColor="#FFC4C4C4"
-            android:textSize="6sp"
             app:layout_constraintTop_toBottomOf="@+id/item_date"
             />
+        <!--android:textSize="6sp"-->
 
         <TextView
             android:id="@+id/item_date"
@@ -36,10 +36,10 @@
             android:layout_height="wrap_content"
             android:text="hahah"
             android:textColor="#FFC4C4C4"
-            android:textSize="6sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             />
+        <!--android:textSize="6sp"-->
     </android.support.constraint.ConstraintLayout>
 </FrameLayout>
