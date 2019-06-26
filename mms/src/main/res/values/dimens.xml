@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="mms_bg_radius">8dp</dimen>
+    <dimen name="mms_conversation_btn_corner_radius">5dp</dimen>
 </resources>

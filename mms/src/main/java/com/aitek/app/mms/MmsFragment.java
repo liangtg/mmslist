@@ -5,14 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
-
 import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.ConversationList;
 import com.daimajia.swipe.SwipeLayout;
@@ -37,7 +35,8 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+        @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_app_mms, container, false);
     }
 
@@ -61,7 +60,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
 
     private class ViewHolder {
         private View view;
-        private ListView listView;
+        private RecyclerView listView;
 
         public ViewHolder(View view) {
             this.view = view;
@@ -69,40 +68,16 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
         }
     }
 
-    private class ConversationListAdapter extends BaseAdapter {
+    private class ConversationListAdapter extends RecyclerView.Adapter<AdapterViewholder> {
 
-        @Override
-        public int getCount() {
-            return conversationList.size();
+        @NonNull @Override
+        public AdapterViewholder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+            return new AdapterViewholder(
+                getLayoutInflater().inflate(R.layout.item_conversation_list, viewGroup, false));
         }
 
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            AdapterViewholder viewholder;
-            View result = convertView;
-            if (null == result) {
-                result = getLayoutInflater().inflate(R.layout.item_conversation_list, parent, false);
-                viewholder = new AdapterViewholder(result);
-                result.setTag(viewholder);
-            } else {
-                viewholder = (AdapterViewholder) convertView.getTag();
-            }
-            bindView(viewholder, position);
-            return result;
-        }
-
-        private void bindView(AdapterViewholder viewholder, int index) {
-            viewholder.setIndex(index);
+        public void onBindViewHolder(@NonNull AdapterViewholder viewholder, int i) {
+            int index = i;
             Conversation item = conversationList.getConversation(index);
             String title = item.person;
             if (TextUtils.isEmpty(title)) title = item.address;
@@ -112,18 +87,26 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             viewholder.itemText.setText(body);
             viewholder.itemDate.setText(TimeUtil.getChatTimeStr(item.date / 1000));
         }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override public int getItemCount() {
+            return conversationList.size();
+        }
     }
 
-    private class AdapterViewholder implements View.OnClickListener {
-        private View itemView;
+    private class AdapterViewholder extends RecyclerView.ViewHolder
+        implements View.OnClickListener {
         private TextView itemTitle;
         private TextView itemText;
         private TextView itemDate;
         private SwipeLayout swipeLayout;
-        private int index;
 
         public AdapterViewholder(View itemView) {
-            this.itemView = itemView;
+            super(itemView);
             swipeLayout = itemView.findViewById(R.id.swipe_layout);
             swipeLayout.setOnClickListener(this);
             itemTitle = itemView.findViewById(R.id.item_title);
@@ -131,17 +114,18 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             itemDate = itemView.findViewById(R.id.item_date);
         }
 
-        public void setIndex(int index) {
-            this.index = index;
-        }
-
         @Override
         public void onClick(View v) {
+            int index = getAdapterPosition();
             int id = v.getId();
             if (R.id.swipe_layout == id) {
                 if (SwipeLayout.Status.Close == swipeLayout.getOpenStatus()) {
-                    getFragmentManager().beginTransaction().add(R.id.conversation_container,
-                            ConversationDetailFragment.show(conversationList.getConversation(index))).addToBackStack("conversation_detail").commit();
+                    getFragmentManager().beginTransaction()
+                        .add(R.id.conversation_container,
+                            ConversationDetailFragment.show(
+                                conversationList.getConversation(index)))
+                        .addToBackStack("conversation_detail")
+                        .commit();
                 }
             }
         }

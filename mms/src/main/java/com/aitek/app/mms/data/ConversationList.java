@@ -4,8 +4,8 @@ import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v4.util.SparseArrayCompat;
-
 import java.util.ArrayList;
 
 public class ConversationList {
@@ -21,12 +21,12 @@ public class ConversationList {
         this.resolver = resolver;
         queryHandler = new QueryHandler(resolver);
         queryHandler.startQuery(QueryHandler.QUERY_ALL,
-                null,
-                Tables.ConversationList.CONVERSATION_URI,
-                Tables.ConversationList.ALL_THREADS_PROJECTION_SIMPLE,
-                null,
-                null,
-                "date DESC");
+            null,
+            Tables.ConversationList.CONVERSATION_URI,
+            Tables.ConversationList.ALL_THREADS_PROJECTION_SIMPLE,
+            null,
+            null,
+            "date DESC");
     }
 
     public void addListener(QueryListener listener) {
@@ -48,25 +48,23 @@ public class ConversationList {
         result.read = cursor.getLong(Tables.ConversationList.READ);
         result.error = cursor.getLong(Tables.ConversationList.ERROR);
         result.hasAttach = cursor.getLong(Tables.ConversationList.HAS_ATTACHMENT);
-        Cursor pc = resolver.query(MMS_PHONE, new String[]{"_id", "address"}, "_id=?", new String[]{result.recipIDs}, null);
+        Cursor pc = resolver.query(MMS_PHONE, new String[] { "_id", "address" }, "_id=?",
+            new String[] { result.recipIDs }, null);
         if (pc.moveToFirst()) {
             result.address = pc.getString(1);
+            Cursor person =
+                resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[] {
+                        ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+                    },
+                    ContactsContract.CommonDataKinds.Phone.NUMBER + "=?",
+                    new String[] { result.address }, null);
+            if (person.moveToFirst()) {
+                result.person = person.getString(0);
+            }
+            person.close();
         }
         pc.close();
-//        pc = resolver.query(Telephony.Sms.CONTENT_URI, new String[]{"thread_id"}, "_id=?", new String[]{String.valueOf(result.id)}, null);
-//        if (pc.moveToFirst()) {
-//            result.threadId = pc.getString(0);
-//            Log.d("mms", "tid:" + result.threadId);
-//            Log.d("mms", "_id:" + result.id);
-//        }
-//        pc.close();
         result.threadId = String.valueOf(result.id);
-//        result.id = cursor.getLong(0);
-//        result.address = cursor.getString(1);
-//        result.body = cursor.getString(2);
-//        result.date = cursor.getLong(3);
-//        result.type = cursor.getInt(4);
-//        result.threadId = cursor.getString(5);
         return result;
     }
 

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="mms_btn_background">#ff53b67b</color>
+    <color name="mms_btn_background">#FF53B67B</color>
+    <color name="mms_btn_contact">#ff3c8edb</color>
+    <color name="mms_btn_delete">#FFFF4848</color>
     <color name="mms_primary">#FF53B67B</color>
 </resources>
