@@ -2,8 +2,11 @@ package com.aitek.app.mms.data;
 
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
 import android.support.v4.util.SparseArrayCompat;
 import java.util.ArrayList;
@@ -16,10 +19,25 @@ public class ConversationList {
     private QueryHandler queryHandler;
     private ArrayList<QueryListener> queryListeners = new ArrayList<>();
     private ContentResolver resolver;
+    private ConversationObserver conversationObserver;
 
     public ConversationList(ContentResolver resolver) {
         this.resolver = resolver;
         queryHandler = new QueryHandler(resolver);
+        conversationObserver = new ConversationObserver();
+        resolver.registerContentObserver(Tables.ConversationList.MMSSMS_FULL_CONVERSATION_URI, true,
+            conversationObserver);
+        queryInternal();
+    }
+
+    public void destroy() {
+        queryHandler.cancelOperation(QueryHandler.QUERY_ALL);
+        if (null != conversationCursor) conversationCursor.close();
+        conversationCursor = null;
+        cacheList.clear();
+    }
+
+    private void queryInternal() {
         queryHandler.startQuery(QueryHandler.QUERY_ALL,
             null,
             Tables.ConversationList.CONVERSATION_URI,
@@ -35,6 +53,13 @@ public class ConversationList {
 
     public int size() {
         return null == conversationCursor ? 0 : conversationCursor.getCount();
+    }
+
+    public void removeAt(int index) {
+        Conversation item = getConversation(index);
+        resolver.delete(Tables.ConversationList.MMSSMS_FULL_CONVERSATION_URI, "thread_id=?",
+            new String[] { item.threadId });
+        queryInternal();
     }
 
     private Conversation readConversation(Cursor cursor) {
@@ -88,6 +113,17 @@ public class ConversationList {
         void completed();
     }
 
+    private class ConversationObserver extends ContentObserver {
+
+        public ConversationObserver() {
+            super(new Handler(Looper.getMainLooper()));
+        }
+
+        @Override public void onChange(boolean selfChange) {
+            queryInternal();
+        }
+    }
+
     private class QueryHandler extends AsyncQueryHandler {
         private static final int QUERY_ALL = 1;
 
@@ -97,6 +133,8 @@ public class ConversationList {
 
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            if (null != conversationCursor) conversationCursor.close();
+            cacheList.clear();
             conversationCursor = cursor;
             dispatchListener();
         }

@@ -1,6 +1,9 @@
 package com.aitek.app.mms;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -31,6 +34,13 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             }
         });
         getFragmentManager().addOnBackStackChangedListener(this);
+        Context context = getActivity();
+        String myPackageName = context.getPackageName();
+        if (!Telephony.Sms.getDefaultSmsPackage(context).equals(myPackageName)) {
+            Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
+            intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
+            startActivity(intent);
+        }
     }
 
     @Nullable
@@ -56,6 +66,11 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
         } else {
             viewHolder.listView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+        conversationList.destroy();
     }
 
     private class ViewHolder {
@@ -86,11 +101,12 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             if (TextUtils.isEmpty(body)) body = item.body;
             viewholder.itemText.setText(body);
             viewholder.itemDate.setText(TimeUtil.getChatTimeStr(item.date / 1000));
+            viewholder.swipeLayout.close();
         }
 
         @Override
         public long getItemId(int position) {
-            return position;
+            return Long.valueOf(conversationList.getConversation(position).threadId);
         }
 
         @Override public int getItemCount() {
@@ -112,11 +128,14 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             itemTitle = itemView.findViewById(R.id.item_title);
             itemText = itemView.findViewById(R.id.item_text);
             itemDate = itemView.findViewById(R.id.item_date);
+            itemView.findViewById(R.id.item_contact).setOnClickListener(this);
+            itemView.findViewById(R.id.item_delete).setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             int index = getAdapterPosition();
+            if (index == RecyclerView.NO_POSITION) return;
             int id = v.getId();
             if (R.id.swipe_layout == id) {
                 if (SwipeLayout.Status.Close == swipeLayout.getOpenStatus()) {
@@ -127,6 +146,9 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
                         .addToBackStack("conversation_detail")
                         .commit();
                 }
+            } else if (R.id.item_contact == id) {
+            } else if (R.id.item_delete == id) {
+                conversationList.removeAt(index);
             }
         }
     }
