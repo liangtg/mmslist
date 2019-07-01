@@ -25,12 +25,14 @@
         >
 
         <ImageButton
+            android:id="@+id/input_sms_voice"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:src="@drawable/mms_ic_input_mms"
             />
 
         <ImageButton
+            android:id="@+id/input_sms_face"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:src="@drawable/mms_ic_input_image"

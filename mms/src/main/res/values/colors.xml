@@ -3,5 +3,8 @@
     <color name="mms_btn_background">#FF53B67B</color>
     <color name="mms_btn_contact">#ff3c8edb</color>
     <color name="mms_btn_delete">#FFFF4848</color>
+    <color name="mms_btn_cancel">#FF525252</color>
     <color name="mms_primary">#FF53B67B</color>
+    <color name="mms_text_white">#FFFBFBFB</color>
+    <color name="mms_text_black">#FF363636</color>
 </resources>

@@ -2,4 +2,7 @@
 <resources>
     <dimen name="mms_bg_radius">8dp</dimen>
     <dimen name="mms_conversation_btn_corner_radius">5dp</dimen>
+    <dimen name="mms_margin_horizontal">5dp</dimen>
+    <dimen name="mms_margin_vertical">8dp</dimen>
+    <dimen name="mms_btn_corner">3dp</dimen>
 </resources>

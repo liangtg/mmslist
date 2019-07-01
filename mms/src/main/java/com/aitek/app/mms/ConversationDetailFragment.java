@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.Tables;
+import com.google.gson.Gson;
 
 public class ConversationDetailFragment extends Fragment {
 
@@ -28,10 +29,12 @@ public class ConversationDetailFragment extends Fragment {
         new String[] { "_id", "address", "person", "body", "type", "date" };
     private ViewHolder viewHolder;
 
+    private Conversation conversation;
+
     public static ConversationDetailFragment show(Conversation conversation) {
         ConversationDetailFragment fragment = new ConversationDetailFragment();
         Bundle args = new Bundle();
-        args.putString(Intent.EXTRA_KEY_EVENT, conversation.threadId);
+        args.putString(Intent.EXTRA_KEY_EVENT, new Gson().toJson(conversation));
         fragment.setArguments(args);
         return fragment;
     }
@@ -39,8 +42,10 @@ public class ConversationDetailFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        conversation = new Gson().fromJson(getArguments().getString(Intent.EXTRA_KEY_EVENT),
+            Conversation.class);
         uri = Tables.ConversationList.MMSSMS_FULL_CONVERSATION_URI.buildUpon()
-            .appendPath(getArguments().getString(Intent.EXTRA_KEY_EVENT))
+            .appendPath(conversation.threadId)
             .build();
     }
 
@@ -56,7 +61,7 @@ public class ConversationDetailFragment extends Fragment {
         viewHolder = new ViewHolder(view);
     }
 
-    private class ViewHolder {
+    private class ViewHolder implements View.OnClickListener {
         private View view;
         private RecyclerView listView;
 
@@ -65,6 +70,23 @@ public class ConversationDetailFragment extends Fragment {
             listView = view.findViewById(R.id.listview);
             listView.setAdapter(new DetailAdapter(getContext(), getActivity().getContentResolver()
                 .query(uri, projection, null, null, "date DESC")));
+            view.findViewById(R.id.input_sms_voice).setOnClickListener(this);
+            view.findViewById(R.id.input_sms_face).setOnClickListener(this);
+        }
+
+        @Override public void onClick(View v) {
+            int id = v.getId();
+            if (R.id.input_sms_face == id) {
+                getFragmentManager().beginTransaction()
+                    .add(R.id.conversation_container, MmsSmsInputFragment.show(conversation))
+                    .addToBackStack("input_sms")
+                    .commit();
+            } else if (R.id.input_sms_voice == id) {
+                getFragmentManager().beginTransaction()
+                    .add(R.id.conversation_container, MmsSmsInputFragment.show(conversation))
+                    .addToBackStack("input_sms")
+                    .commit();
+            }
         }
     }
 

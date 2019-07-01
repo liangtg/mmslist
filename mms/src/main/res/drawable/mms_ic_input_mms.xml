@@ -8,7 +8,9 @@
                     <size android:height="32dp" android:width="32dp"/>
                 </shape>
             </item>
-            <item android:drawable="@drawable/ic_create_message" android:gravity="center" android:height="16dp" android:width="16dp"></item>
+            <item>
+                <inset android:drawable="@drawable/ic_create_message" android:insetBottom="8dp" android:insetLeft="8dp" android:insetRight="8dp" android:insetTop="8dp"/>
+            </item>
         </layer-list>
     </item>
 </selector>

@@ -22,6 +22,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
     private ViewHolder viewHolder;
     private ConversationList conversationList;
     private ConversationListAdapter adapter;
+    private SwipeInfo swipeInfo = new SwipeInfo();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,6 +64,11 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
         if (null == getFragmentManager()) return;
         if (getFragmentManager().getBackStackEntryCount() > 0) {
             viewHolder.listView.setVisibility(View.GONE);
+            for (int i = 0; i < viewHolder.container.getChildCount() - 1; i++) {
+                viewHolder.container.getChildAt(i).setVisibility(View.GONE);
+            }
+            viewHolder.container.getChildAt(viewHolder.container.getChildCount() - 1)
+                .setVisibility(View.VISIBLE);
         } else {
             viewHolder.listView.setVisibility(View.VISIBLE);
         }
@@ -76,10 +82,12 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
     private class ViewHolder {
         private View view;
         private RecyclerView listView;
+        private ViewGroup container;
 
         public ViewHolder(View view) {
             this.view = view;
             listView = view.findViewById(R.id.listview);
+            container = view.findViewById(R.id.conversation_container);
         }
     }
 
@@ -93,6 +101,11 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
 
         public void onBindViewHolder(@NonNull AdapterViewholder viewholder, int i) {
             int index = i;
+            if (swipeInfo.lastIndex == index) {
+                viewholder.swipeLayout.open(true, false);
+            } else {
+                viewholder.swipeLayout.close(true, false);
+            }
             Conversation item = conversationList.getConversation(index);
             String title = item.person;
             if (TextUtils.isEmpty(title)) title = item.address;
@@ -115,7 +128,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
     }
 
     private class AdapterViewholder extends RecyclerView.ViewHolder
-        implements View.OnClickListener {
+        implements View.OnClickListener, SwipeLayout.SwipeListener {
         private TextView itemTitle;
         private TextView itemText;
         private TextView itemDate;
@@ -125,6 +138,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             super(itemView);
             swipeLayout = itemView.findViewById(R.id.swipe_layout);
             swipeLayout.setOnClickListener(this);
+            swipeLayout.addSwipeListener(this);
             itemTitle = itemView.findViewById(R.id.item_title);
             itemText = itemView.findViewById(R.id.item_text);
             itemDate = itemView.findViewById(R.id.item_date);
@@ -147,9 +161,50 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
                         .commit();
                 }
             } else if (R.id.item_contact == id) {
+                getFragmentManager().beginTransaction()
+                    .add(R.id.conversation_container,
+                        SmsContactActionFragment.show(
+                            conversationList.getConversation(index)))
+                    .addToBackStack("contact_detail")
+                    .commit();
             } else if (R.id.item_delete == id) {
                 conversationList.removeAt(index);
             }
+        }
+
+        @Override public void onStartOpen(SwipeLayout layout) {
+            if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
+            swipeInfo.startOpen(getAdapterPosition());
+        }
+
+        @Override public void onOpen(SwipeLayout layout) {
+        }
+
+        @Override public void onStartClose(SwipeLayout layout) {
+        }
+
+        @Override public void onClose(SwipeLayout layout) {
+            if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
+            swipeInfo.close(getAdapterPosition());
+        }
+
+        @Override public void onUpdate(SwipeLayout layout, int leftOffset, int topOffset) {
+        }
+
+        @Override public void onHandRelease(SwipeLayout layout, float xvel, float yvel) {
+        }
+    }
+
+    private class SwipeInfo {
+        private int lastIndex = -1;
+
+        public void startOpen(int index) {
+            if (lastIndex >= 0) adapter.notifyItemChanged(lastIndex);
+            lastIndex = index;
+        }
+
+        public void close(int index) {
+            if (lastIndex == index) lastIndex = -1;
         }
     }
 }
