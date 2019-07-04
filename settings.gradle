@@ -1,1 +1,1 @@
-include ':app',  ':mms'
+include ':app',  ':mms', ':dds'

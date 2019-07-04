@@ -5,7 +5,6 @@
             <item>
                 <shape android:shape="oval">
                     <solid android:color="@color/mms_btn_background"/>
-                    <size android:height="32dp" android:width="32dp"/>
                 </shape>
             </item>
             <item>

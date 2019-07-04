@@ -14,13 +14,15 @@
         android:layout_weight="1"
         android:orientation="vertical"
         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        app:stackFromEnd="true"
+        app:reverseLayout="true"
+        app:stackFromEnd="false"
         tools:listitem="@layout/item_conversation_list"
         ></android.support.v7.widget.RecyclerView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/mms_margin_horizontal"
         android:orientation="horizontal"
         >
 
@@ -28,14 +30,15 @@
             android:id="@+id/input_sms_voice"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/mms_ic_input_mms"
+            android:background="@drawable/mms_ic_input_mms"
             />
 
         <ImageButton
             android:id="@+id/input_sms_face"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@drawable/mms_ic_input_image"
+            android:background="@drawable/mms_ic_input_image"
+            android:visibility="gone"
             />
     </LinearLayout>
 </LinearLayout>

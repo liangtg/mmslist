@@ -1,18 +1,25 @@
 package com.aitek.app.mms;
 
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -21,15 +28,20 @@ import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.Tables;
 import com.google.gson.Gson;
 
-public class ConversationDetailFragment extends Fragment {
+public class ConversationDetailFragment extends MmsBaseFragment {
 
+    private DetailAdapter adapter;
     private Uri uri;
-
     private String[] projection =
         new String[] { "_id", "address", "person", "body", "type", "date" };
     private ViewHolder viewHolder;
-
     private Conversation conversation;
+    private QueryHandler queryHandler;
+    private ContentObserver observer = new ContentObserver(new Handler(Looper.getMainLooper())) {
+        @Override public void onChange(boolean selfChange) {
+            query();
+        }
+    };
 
     public static ConversationDetailFragment show(Conversation conversation) {
         ConversationDetailFragment fragment = new ConversationDetailFragment();
@@ -39,14 +51,33 @@ public class ConversationDetailFragment extends Fragment {
         return fragment;
     }
 
+    @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MmsTitleController.getTitleView().setBackTitle(UIUtils.getTitle(conversation));
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ContentResolver resolver = getActivity().getContentResolver();
+        queryHandler = new QueryHandler(resolver);
         conversation = new Gson().fromJson(getArguments().getString(Intent.EXTRA_KEY_EVENT),
             Conversation.class);
         uri = Tables.ConversationList.MMSSMS_FULL_CONVERSATION_URI.buildUpon()
             .appendPath(conversation.threadId)
             .build();
+        resolver.registerContentObserver(uri, false, observer);
+        query();
+    }
+
+    private void query() {
+        queryHandler.startQuery(0, null, uri, projection, null, null, "date DESC");
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+        getActivity().getContentResolver().unregisterContentObserver(observer);
+        adapter.cursor.close();
     }
 
     @Nullable
@@ -68,8 +99,8 @@ public class ConversationDetailFragment extends Fragment {
         public ViewHolder(View view) {
             this.view = view;
             listView = view.findViewById(R.id.listview);
-            listView.setAdapter(new DetailAdapter(getContext(), getActivity().getContentResolver()
-                .query(uri, projection, null, null, "date DESC")));
+            adapter = new DetailAdapter(getContext(), new MatrixCursor(new String[0]));
+            listView.setAdapter(adapter);
             view.findViewById(R.id.input_sms_voice).setOnClickListener(this);
             view.findViewById(R.id.input_sms_face).setOnClickListener(this);
         }
@@ -78,12 +109,12 @@ public class ConversationDetailFragment extends Fragment {
             int id = v.getId();
             if (R.id.input_sms_face == id) {
                 getFragmentManager().beginTransaction()
-                    .add(R.id.conversation_container, MmsSmsInputFragment.show(conversation))
+                    .add(R.id.mms_fragment_container, MmsSmsInputFragment.show(conversation))
                     .addToBackStack("input_sms")
                     .commit();
             } else if (R.id.input_sms_voice == id) {
                 getFragmentManager().beginTransaction()
-                    .add(R.id.conversation_container, MmsSmsInputFragment.show(conversation))
+                    .add(R.id.mms_fragment_container, MmsSmsInputFragment.show(conversation))
                     .addToBackStack("input_sms")
                     .commit();
             }
@@ -95,6 +126,14 @@ public class ConversationDetailFragment extends Fragment {
 
         public DetailAdapter(Context context, Cursor c) {
             this.cursor = c;
+        }
+
+        private void swipeCursor(Cursor cursor) {
+            if (null != this.cursor) {
+                this.cursor.close();
+            }
+            this.cursor = cursor;
+            notifyDataSetChanged();
         }
 
         @NonNull @Override
@@ -139,6 +178,21 @@ public class ConversationDetailFragment extends Fragment {
             itemDate = view.findViewById(R.id.item_date);
             itemText = view.findViewById(R.id.item_text);
             itemTextContainer = view.findViewById(R.id.item_text_container);
+        }
+    }
+
+    private class QueryHandler extends AsyncQueryHandler {
+
+        public QueryHandler(ContentResolver cr) {
+            super(cr);
+        }
+
+        @Override protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            if (isAdded()) {
+                adapter.swipeCursor(cursor);
+            } else {
+                cursor.close();
+            }
         }
     }
 }

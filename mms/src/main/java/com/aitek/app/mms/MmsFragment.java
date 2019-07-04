@@ -1,16 +1,19 @@
 package com.aitek.app.mms;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -18,13 +21,14 @@ import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.ConversationList;
 import com.daimajia.swipe.SwipeLayout;
 
-public class MmsFragment extends Fragment implements FragmentManager.OnBackStackChangedListener {
+public class MmsFragment extends MmsBaseFragment
+    implements FragmentManager.OnBackStackChangedListener {
     private ViewHolder viewHolder;
     private ConversationList conversationList;
     private ConversationListAdapter adapter;
     private SwipeInfo swipeInfo = new SwipeInfo();
 
-    @Override
+    @TargetApi(Build.VERSION_CODES.KITKAT) @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         conversationList = new ConversationList(getActivity().getContentResolver());
@@ -42,6 +46,11 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
             startActivity(intent);
         }
+    }
+
+    @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MmsTitleController.getTitleView().setTitle(getString(R.string.mms_title));
     }
 
     @Nullable
@@ -62,16 +71,16 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
     @Override
     public void onBackStackChanged() {
         if (null == getFragmentManager()) return;
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            viewHolder.listView.setVisibility(View.GONE);
-            for (int i = 0; i < viewHolder.container.getChildCount() - 1; i++) {
-                viewHolder.container.getChildAt(i).setVisibility(View.GONE);
-            }
-            viewHolder.container.getChildAt(viewHolder.container.getChildCount() - 1)
-                .setVisibility(View.VISIBLE);
-        } else {
-            viewHolder.listView.setVisibility(View.VISIBLE);
-        }
+        //if (getFragmentManager().getBackStackEntryCount() > 0) {
+        //    viewHolder.listView.setVisibility(View.GONE);
+        //    for (int i = 0; i < viewHolder.container.getChildCount() - 1; i++) {
+        //        viewHolder.container.getChildAt(i).setVisibility(View.GONE);
+        //    }
+        //    viewHolder.container.getChildAt(viewHolder.container.getChildCount() - 1)
+        //        .setVisibility(View.VISIBLE);
+        //} else {
+        //    viewHolder.listView.setVisibility(View.VISIBLE);
+        //}
     }
 
     @Override public void onDestroy() {
@@ -82,12 +91,12 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
     private class ViewHolder {
         private View view;
         private RecyclerView listView;
-        private ViewGroup container;
+        //private ViewGroup container;
 
         public ViewHolder(View view) {
             this.view = view;
             listView = view.findViewById(R.id.listview);
-            container = view.findViewById(R.id.conversation_container);
+            //container = view.findViewById(R.id.mms_fragment_container);
         }
     }
 
@@ -154,7 +163,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
             if (R.id.swipe_layout == id) {
                 if (SwipeLayout.Status.Close == swipeLayout.getOpenStatus()) {
                     getFragmentManager().beginTransaction()
-                        .add(R.id.conversation_container,
+                        .add(R.id.mms_fragment_container,
                             ConversationDetailFragment.show(
                                 conversationList.getConversation(index)))
                         .addToBackStack("conversation_detail")
@@ -162,7 +171,7 @@ public class MmsFragment extends Fragment implements FragmentManager.OnBackStack
                 }
             } else if (R.id.item_contact == id) {
                 getFragmentManager().beginTransaction()
-                    .add(R.id.conversation_container,
+                    .add(R.id.mms_fragment_container,
                         SmsContactActionFragment.show(
                             conversationList.getConversation(index)))
                     .addToBackStack("contact_detail")

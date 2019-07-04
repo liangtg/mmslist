@@ -5,8 +5,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -23,7 +24,7 @@ import com.google.gson.Gson;
  * @UpdateDate: 19-7-1 上午11:11
  * @UpdateRemark: 更新说明
  */
-public class SmsContactActionFragment extends Fragment {
+public class SmsContactActionFragment extends MmsBaseFragment {
     private Conversation conversation;
     private ViewHolder viewHolder;
 
@@ -39,6 +40,11 @@ public class SmsContactActionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         conversation = new Gson().fromJson(getArguments().getString(Intent.EXTRA_KEY_EVENT),
             Conversation.class);
+    }
+
+    @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MmsTitleController.getTitleView().setBackTitle(UIUtils.getTitle(conversation));
     }
 
     @Nullable @Override
@@ -72,7 +78,7 @@ public class SmsContactActionFragment extends Fragment {
             } else if (R.id.message == id) {
                 getFragmentManager().popBackStack();
                 getFragmentManager().beginTransaction()
-                    .add(R.id.conversation_container, ConversationDetailFragment.show(conversation))
+                    .add(R.id.mms_fragment_container, ConversationDetailFragment.show(conversation))
                     .addToBackStack("conversation_detail")
                     .commit();
             }
