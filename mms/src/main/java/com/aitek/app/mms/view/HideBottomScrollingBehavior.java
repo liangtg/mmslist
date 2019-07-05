@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -35,16 +34,16 @@ public class HideBottomScrollingBehavior<V extends View> extends CoordinatorLayo
         super(context, attrs);
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(@NonNull CoordinatorLayout parent, @NonNull V child,
-        @NonNull MotionEvent ev) {
-        if (cancelTouch) return false;
-        if (null == footer) return false;
-        Log.d("sc", "intercept " + ev.getAction() + " top: " + child.getTop());
-        markTouch(child, ev);
-        //return shouldEndTouch(child);
-        return false;
-    }
+    //@Override
+    //public boolean onInterceptTouchEvent(@NonNull CoordinatorLayout parent, @NonNull V child,
+    //    @NonNull MotionEvent ev) {
+    //    if (cancelTouch) return false;
+    //    if (null == footer) return false;
+    //    Log.d("sc", "intercept " + ev.getAction() + " top: " + child.getTop());
+    //    markTouch(child, ev);
+    //    return shouldEndTouch(child);
+    //    //return false;
+    //}
 
     private void markTouch(@NonNull V child,
         @NonNull MotionEvent ev) {
@@ -53,24 +52,24 @@ public class HideBottomScrollingBehavior<V extends View> extends CoordinatorLayo
         startTop = child.getTop();
     }
 
-    @Override public boolean onTouchEvent(@NonNull CoordinatorLayout parent, @NonNull V child,
-        @NonNull MotionEvent ev) {
-        if (cancelTouch) return false;
-        if (null == footer) return false;
-        if (lastDownTime != ev.getDownTime()) {
-            markTouch(child, ev);
-        }
-        int dis = Math.round(startY - ev.getY());
-        dis += child.getTop() - startTop;
-        //offset(child, child.getTop(), dis);
-        if (shouldEndTouch(child)) {
-            cancelTouch = true;
-            parent.requestDisallowInterceptTouchEvent(true);
-            parent.requestDisallowInterceptTouchEvent(false);
-            cancelTouch = false;
-        }
-        return shouldEndTouch(child);
-    }
+    //@Override public boolean onTouchEvent(@NonNull CoordinatorLayout parent, @NonNull V child,
+    //    @NonNull MotionEvent ev) {
+    //    if (cancelTouch) return false;
+    //    if (null == footer) return false;
+    //    if (lastDownTime != ev.getDownTime()) {
+    //        markTouch(child, ev);
+    //    }
+    //    int dis = Math.round(startY - ev.getY());
+    //    dis += child.getTop() - startTop;
+    //    offset(child, child.getTop(), dis);
+    //    if (shouldEndTouch(child)) {
+    //        cancelTouch = true;
+    //        parent.requestDisallowInterceptTouchEvent(true);
+    //        parent.requestDisallowInterceptTouchEvent(false);
+    //        cancelTouch = false;
+    //    }
+    //    return shouldEndTouch(child);
+    //}
 
     private boolean shouldEndTouch(V child) {
         if (null == footer) return true;
@@ -93,10 +92,18 @@ public class HideBottomScrollingBehavior<V extends View> extends CoordinatorLayo
         return nestedScrollAxes == ViewCompat.SCROLL_AXIS_VERTICAL;
     }
 
+    @Override public boolean onLayoutChild(@NonNull CoordinatorLayout parent, @NonNull V child,
+        int layoutDirection) {
+        reset(child);
+        return super.onLayoutChild(parent, child, layoutDirection);
+    }
+
     @Override
     public boolean onDependentViewChanged(@NonNull CoordinatorLayout parent, @NonNull V child,
         @NonNull View dependency) {
+        View old = footer;
         footer = findFooter(parent);
+        if (old != footer) reset(child);
         return false;
     }
 
@@ -109,13 +116,13 @@ public class HideBottomScrollingBehavior<V extends View> extends CoordinatorLayo
             int dis = 0;
             if (dyConsumed == 0) {
                 dis = dyUnconsumed;
-                //offset(child, old, dis);
-                ofsetPadding(child, dis);
+                offset(child, old, dis);
+                //ofsetPadding(child, dis);
             } else if (dyUnconsumed == 0) {
                 dis = dyConsumed;
                 if (old != 0) {
-                    //offset(child, old, dis);
-                    ofsetPadding(child, dis);
+                    offset(child, old, dis);
+                    //ofsetPadding(child, dis);
                 }
             }
         }
@@ -124,7 +131,7 @@ public class HideBottomScrollingBehavior<V extends View> extends CoordinatorLayo
     private void offset(@NonNull V child, int old, int dis) {
         int top = old - dis;
         top = Math.min(0, Math.max(-footer.getHeight(), top));
-        ViewCompat.offsetTopAndBottom(child, top - old);
+        //ViewCompat.offsetTopAndBottom(child, top - old);
     }
 
     private void ofsetPadding(V child, int dis) {
@@ -141,5 +148,16 @@ public class HideBottomScrollingBehavior<V extends View> extends CoordinatorLayo
             if (child instanceof FooterLayout) return child;
         }
         return null;
+    }
+
+    private void reset(V child) {
+        int top = child.getTop();
+        if (null == footer) {
+            ViewCompat.offsetTopAndBottom(child, -top);
+            child.setPadding(0, 0, 0, 0);
+        } else {
+            //offset(child, top, footer.getHeight() - top);
+            child.setPadding(0, 0, 0, footer.getHeight());
+        }
     }
 }
