@@ -1,47 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:id="@+id/item_view"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/item_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="3dp"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+    android:paddingLeft="@dimen/mms_margin_horizontal"
+    android:paddingRight="@dimen/mms_margin_horizontal"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    >
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:id="@+id/item_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/mms_margin_horizontal"
+            android:gravity="center"
+            android:text="hahah"
+            android:textAppearance="@style/mms.TextAppearance.Body1"
+            app:layout_constraintBottom_toTopOf="@+id/item_text_container"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <LinearLayout
             android:id="@+id/item_text_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="right"
             android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/item_date">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_date"
+            >
 
             <TextView
                 android:id="@+id/item_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="right"
                 android:background="@drawable/mms_detail_receiver"
                 android:paddingLeft="@dimen/mms_bg_radius"
                 android:paddingRight="@dimen/mms_bg_radius"
                 android:text="hahah"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-                android:textColor="#FFC4C4C4" />
-            <!--android:textSize="6sp"-->
+                android:textColor="#FFC4C4C4"
+                />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/item_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="hahah"
-            android:textColor="#FFC4C4C4"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
         <!--android:textSize="6sp"-->
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 </FrameLayout>

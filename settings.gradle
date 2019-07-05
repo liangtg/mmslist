@@ -1,1 +1,1 @@
-include ':app',  ':mms', ':dds'
+include ':app',  ':mms', ':dds', ':androidxtest'

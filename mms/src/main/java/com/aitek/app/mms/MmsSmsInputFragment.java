@@ -1,18 +1,21 @@
 package com.aitek.app.mms;
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 import com.aispeech.dui.dds.DDS;
 import com.aispeech.dui.dds.agent.ASREngine;
 import com.aispeech.dui.dds.exceptions.DDSNotInitCompleteException;
@@ -115,6 +118,12 @@ public class MmsSmsInputFragment extends MmsBaseFragment implements ASREngine.Ca
     private void sendMessage() {
         if (null != message) return;
         if (viewHolder.inputSms.length() == 0) return;
+        TelephonyManager tm =
+            (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+        if (null == tm.getSubscriberId()) {
+            Toast.makeText(getActivity(), "服务不可用", Toast.LENGTH_SHORT).show();
+            return;
+        }
         message = viewHolder.inputSms.getText().toString();
         SmsManager smsManager = SmsManager.getDefault();
         ArrayList<String> list = smsManager.divideMessage(message);

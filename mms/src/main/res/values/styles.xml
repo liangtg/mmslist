@@ -16,4 +16,9 @@
         <item name="android:textColor">@color/mms_text_black</item>
     </style>
 
+    <style name="mms.TextAppearance.Body1">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/mms_text_white</item>
+    </style>
+
 </resources>

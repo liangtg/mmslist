@@ -154,12 +154,12 @@ public class ConversationDetailFragment extends MmsBaseFragment {
                 viewholder.itemTextContainer.setPadding(0, 0, pad, 0);
                 viewholder.itemText.setBackgroundResource(R.drawable.mms_detail_sender);
                 viewholder.itemText.setTextColor(0xFF000000);
-                viewholder.itemTextContainer.setGravity(Gravity.LEFT);
+                viewholder.itemTextContainer.setHorizontalGravity(Gravity.LEFT);
             } else {
                 viewholder.itemTextContainer.setPadding(pad, 0, 0, 0);
-                viewholder.itemTextContainer.setGravity(Gravity.RIGHT);
                 viewholder.itemText.setBackgroundResource(R.drawable.mms_detail_receiver);
                 viewholder.itemText.setTextColor(0xFFFBFBFB);
+                viewholder.itemTextContainer.setHorizontalGravity(Gravity.RIGHT);
             }
         }
 

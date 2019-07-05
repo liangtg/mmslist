@@ -176,7 +176,9 @@ public class MmsFragment extends MmsBaseFragment
                             conversationList.getConversation(index)))
                     .addToBackStack("contact_detail")
                     .commit();
+                swipeLayout.close();
             } else if (R.id.item_delete == id) {
+                swipeLayout.close();
                 conversationList.removeAt(index);
             }
         }
