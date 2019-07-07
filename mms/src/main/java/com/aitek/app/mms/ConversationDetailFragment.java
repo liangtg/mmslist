@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.MatrixCursor;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import com.aitek.app.mms.data.Conversation;
 import com.aitek.app.mms.data.Tables;
 import com.google.gson.Gson;
@@ -99,6 +101,7 @@ public class ConversationDetailFragment extends MmsBaseFragment {
         public ViewHolder(View view) {
             this.view = view;
             listView = view.findViewById(R.id.listview);
+            listView.addItemDecoration(new ScaleDecoration());
             adapter = new DetailAdapter(getContext(), new MatrixCursor(new String[0]));
             listView.setAdapter(adapter);
             view.findViewById(R.id.input_sms_voice).setOnClickListener(this);
@@ -146,7 +149,18 @@ public class ConversationDetailFragment extends MmsBaseFragment {
         public void onBindViewHolder(@NonNull AdapterViewholder viewholder, int i) {
             cursor.moveToPosition(i);
             viewholder.itemText.setText(cursor.getString(3));
-            viewholder.itemDate.setText(TimeUtil.getChatTimeStr(cursor.getLong(5) / 1000));
+            long time = cursor.getLong(5);
+            if (!cursor.moveToNext()) {
+                viewholder.itemDate.setVisibility(View.VISIBLE);
+            } else {
+                if (time - cursor.getLong(5) >= 10 * 60 * 1000) {
+                    viewholder.itemDate.setVisibility(View.VISIBLE);
+                } else {
+                    viewholder.itemDate.setVisibility(View.GONE);
+                }
+            }
+            cursor.moveToPrevious();
+            viewholder.itemDate.setText(TimeUtil.getChatTimeStr(time / 1000));
             int type = cursor.getInt(4);
             int pad = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16,
                 getResources().getDisplayMetrics());
@@ -195,4 +209,28 @@ public class ConversationDetailFragment extends MmsBaseFragment {
             }
         }
     }
+
+    private class ScaleDecoration extends RecyclerView.ItemDecoration {
+
+        @Override
+        public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+            for (int i = 0; i < parent.getChildCount(); i++) {
+                AdapterViewholder holder = (AdapterViewholder) parent.getChildViewHolder(parent.getChildAt(i));
+                if (holder.itemDate.getVisibility() == View.VISIBLE) {
+                    int top = holder.itemView.getTop();
+                    float scale = 1f;
+                    if (top <= 0) {
+                        scale = (holder.itemDate.getHeight() + top) * 1f / holder.itemDate.getHeight();
+                        scale = Math.max(0.5f, scale);
+                    } else {
+                    }
+                    holder.itemDate.setScaleX(scale);
+                    holder.itemDate.setScaleY(scale);
+                    holder.itemDate.setPivotX(holder.itemDate.getWidth() / 2);
+                    holder.itemDate.setPivotY(holder.itemDate.getHeight());
+                }
+            }
+        }
+    }
+
 }
